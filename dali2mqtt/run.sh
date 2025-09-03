@@ -1,6 +1,9 @@
 #!/usr/bin/with-contenv bash
 set -euo pipefail
 
+# (Optional) Sicherstellen, dass die venv im PATH ist
+export PATH="/opt/venv/bin:$PATH"
+
 MQTT_HOST=$(jq -r '.mqtt.host' /data/options.json)
 MQTT_PORT=$(jq -r '.mqtt.port' /data/options.json)
 MQTT_USER=$(jq -r '.mqtt.username' /data/options.json)
@@ -24,4 +27,13 @@ if [ ! -e "${DALI_DEVICE}" ]; then
   exit 1
 fi
 
-exec dali2mqtt       --mqtt-host "${MQTT_HOST}"       --mqtt-port "${MQTT_PORT}"       ${MQTT_USER:+--mqtt-username "${MQTT_USER}"}       ${MQTT_PASS:+--mqtt-password "${MQTT_PASS}"}       --base-topic "${BASE_TOPIC}"       --dali-driver "${DALI_DRIVER}"       --device "${DALI_DEVICE}"       --log-level "${LOG_LEVEL}"
+# explizit das venv-Binary aufrufen (liegt auch im PATH)
+exec dali2mqtt \
+  --mqtt-host "${MQTT_HOST}" \
+  --mqtt-port "${MQTT_PORT}" \
+  ${MQTT_USER:+--mqtt-username "${MQTT_USER}"} \
+  ${MQTT_PASS:+--mqtt-password "${MQTT_PASS}"} \
+  --base-topic "${BASE_TOPIC}" \
+  --dali-driver "${DALI_DRIVER}" \
+  --device "${DALI_DEVICE}" \
+  --log-level "${LOG_LEVEL}"
