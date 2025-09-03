@@ -1,5 +1,5 @@
 name: dali2mqtt (Tridonic/Lunatone HID)
-version: "0.1.1"
+version: "0.1.2"
 slug: dali2mqtt
 description: Bridge DALI (Tridonic/Lunatone HID) to MQTT for Home Assistant
 arch:
