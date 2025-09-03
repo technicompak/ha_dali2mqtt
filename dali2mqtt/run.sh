@@ -1,7 +1,6 @@
 #!/usr/bin/with-contenv bash
 set -euo pipefail
 
-# (Optional) Sicherstellen, dass die venv im PATH ist
 export PATH="/opt/venv/bin:$PATH"
 
 MQTT_HOST=$(jq -r '.mqtt.host' /data/options.json)
@@ -16,6 +15,7 @@ LOG_LEVEL=$(jq -r '.dali.log_level' /data/options.json)
 
 echo "[dali2mqtt] Start: device=${DALI_DEVICE}, driver=${DALI_DRIVER}, topic=${BASE_TOPIC}"
 
+# wait up to 15s for hid device
 for i in $(seq 1 30); do
   [ -e "${DALI_DEVICE}" ] && break
   echo "[dali2mqtt] waiting for ${DALI_DEVICE} ..."
@@ -27,13 +27,5 @@ if [ ! -e "${DALI_DEVICE}" ]; then
   exit 1
 fi
 
-# explizit das venv-Binary aufrufen (liegt auch im PATH)
-exec dali2mqtt \
-  --mqtt-host "${MQTT_HOST}" \
-  --mqtt-port "${MQTT_PORT}" \
-  ${MQTT_USER:+--mqtt-username "${MQTT_USER}"} \
-  ${MQTT_PASS:+--mqtt-password "${MQTT_PASS}"} \
-  --base-topic "${BASE_TOPIC}" \
-  --dali-driver "${DALI_DRIVER}" \
-  --device "${DALI_DEVICE}" \
-  --log-level "${LOG_LEVEL}"
+# Run the module
+exec python -m dali2mqtt.dali2mqtt   --mqtt-server "${MQTT_HOST}"   --mqtt-port "${MQTT_PORT}"   ${MQTT_USER:+--mqtt-username "${MQTT_USER}"}   ${MQTT_PASS:+--mqtt-password "${MQTT_PASS}"}   --mqtt-base-topic "${BASE_TOPIC}"   --dali-driver "${DALI_DRIVER}"   --device "${DALI_DEVICE}"   --log-level "${LOG_LEVEL}"

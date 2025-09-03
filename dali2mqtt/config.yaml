@@ -1,10 +1,11 @@
 name: dali2mqtt (Tridonic/Lunatone HID)
 version: "0.1.2"
 slug: dali2mqtt
-description: Bridge DALI (Tridonic/Lunatone HID) to MQTT for Home Assistant
+description: Bridge DALI (Tridonic/Lunatone HID) to MQTT for Home Assistant (wrapper around dgomes/dali2mqtt)
 arch:
   - aarch64
   - armv7
+  - amd64
 init: false
 startup: services
 boot: auto
@@ -33,13 +34,10 @@ schema:
     base_topic: str
   dali:
     device: str
-    driver: list(tridonic|auto)
+    driver: list(tridonic|auto|dali_server|hasseb)
     log_level: list(trace|debug|info|warning|error)
 privileged:
   - SYS_RAWIO
-  - SYS_ADMIN
-  - SYS_RESOURCE
-  - NET_ADMIN
 map:
   - config:rw
   - share:rw
