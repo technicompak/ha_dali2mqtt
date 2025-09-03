@@ -1,5 +1,5 @@
 {
   "name": "DALI2MQTT Add-ons",
-  "url": "https://example.com/ha-addons-dali2mqtt",
+  "url": "https://github.com/your-user/ha-dali2mqtt-addon",
   "maintainer": "Your Name <you@example.com>"
 }
