@@ -1,0 +1,46 @@
+name: dali2mqtt (Tridonic/Lunatone HID)
+version: "0.1.0"
+slug: dali2mqtt
+description: Bridge DALI (Tridonic/Lunatone HID) to MQTT for Home Assistant
+arch:
+  - aarch64
+  - armv7
+init: false
+startup: services
+boot: auto
+ingress: false
+uart: false
+udev: true
+devices:
+  - /dev/hidraw0:/dev/hidraw0
+options:
+  mqtt:
+    host: 127.0.0.1
+    port: 1883
+    username: ""
+    password: ""
+    base_topic: "dali"
+  dali:
+    device: "/dev/hidraw0"
+    driver: "tridonic"
+    log_level: "info"
+schema:
+  mqtt:
+    host: str
+    port: int
+    username: str
+    password: str
+    base_topic: str
+  dali:
+    device: str
+    driver: list(tridonic|auto)
+    log_level: list(trace|debug|info|warning|error)
+privileged:
+  - SYS_RAWIO
+  - SYS_ADMIN
+  - SYS_RESOURCE
+  - NET_ADMIN
+map:
+  - config:rw
+  - share:rw
+timeout: 120
