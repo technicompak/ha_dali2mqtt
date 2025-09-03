@@ -16,6 +16,10 @@ DALI_DEVICE=$(jq -r '.dali.device' /data/options.json)
 DALI_DRIVER=$(jq -r '.dali.driver' /data/options.json)
 LOG_LEVEL=$(jq -r '.dali.log_level' /data/options.json)
 
+# 👉 WICHTIG: für den Python-Preflight als ENV exportieren
+export MQTT_HOST MQTT_PORT MQTT_USER MQTT_PASS BASE_TOPIC
+export DALI_DEVICE DALI_DRIVER LOG_LEVEL
+
 echo "[dali2mqtt] Start: device=${DALI_DEVICE}, driver=${DALI_DRIVER}, topic=${BASE_TOPIC}"
 echo "[dali2mqtt] MQTT target: host=${MQTT_HOST} port=${MQTT_PORT} user=${MQTT_USER}"
 
@@ -45,6 +49,8 @@ port = int(os.environ.get("MQTT_PORT", "1883"))
 user = os.environ.get("MQTT_USER") or None
 password = os.environ.get("MQTT_PASS") or None
 
+print(f"[preflight] using host={host} port={port} user={user}")
+
 cli = mqtt.Client(client_id="preflight-dali2mqtt", protocol=mqtt.MQTTv311)
 if user:
     cli.username_pw_set(user, password=password)
@@ -59,7 +65,7 @@ cli.on_connect = on_connect
 try:
     cli.connect(host, port, keepalive=10)
     cli.loop_start()
-    for _ in range(20):
+    for _ in range(40):
         if ok[0]: break
         time.sleep(0.25)
     cli.loop_stop()
