@@ -16,7 +16,7 @@ DALI_DEVICE=$(jq -r '.dali.device' /data/options.json)
 DALI_DRIVER=$(jq -r '.dali.driver' /data/options.json)
 LOG_LEVEL=$(jq -r '.dali.log_level' /data/options.json)
 
-# 👉 WICHTIG: für den Python-Preflight als ENV exportieren
+# Für Preflight als ENV exportieren
 export MQTT_HOST MQTT_PORT MQTT_USER MQTT_PASS BASE_TOPIC
 export DALI_DEVICE DALI_DRIVER LOG_LEVEL
 
@@ -82,13 +82,13 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Modul starten (CLI-Flags wie im dgomes-Repo)
+# Modul starten – korrekte Flags laut dgomes/dali2mqtt:
 exec python -m dali2mqtt.dali2mqtt \
-  --mqtt-host "${MQTT_HOST}" \
+  --mqtt-server "${MQTT_HOST}" \
   --mqtt-port "${MQTT_PORT}" \
   ${MQTT_USER:+--mqtt-username "${MQTT_USER}"} \
   ${MQTT_PASS:+--mqtt-password "${MQTT_PASS}"} \
-  --base-topic "${BASE_TOPIC}" \
+  --mqtt-base-topic "${BASE_TOPIC}" \
   --dali-driver "${DALI_DRIVER}" \
   --device "${DALI_DEVICE}" \
   --log-level "${LOG_LEVEL}"
