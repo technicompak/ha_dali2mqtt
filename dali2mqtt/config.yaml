@@ -1,5 +1,5 @@
 name: dali2mqtt (Tridonic/Lunatone HID)
-version: "0.1.7"
+version: "0.1.8"
 slug: dali2mqtt
 description: Bridge DALI (Tridonic/Lunatone HID) to MQTT for Home Assistant (wrapper around dgomes/dali2mqtt)
 arch:
@@ -16,7 +16,7 @@ devices:
   - /dev/hidraw0:/dev/hidraw0
 options:
   mqtt:
-    host: 127.0.0.1
+    host: core-mosquitto        # << Standard-Host für das Mosquitto-Add-on
     port: 1883
     username: ""
     password: ""
@@ -24,7 +24,8 @@ options:
   dali:
     device: "/dev/hidraw0"
     driver: "tridonic"
-    log_level: "info"
+    log_level: "debug"
+  ha_discovery_prefix: "homeassistant"   # << NEU
 schema:
   mqtt:
     host: str
@@ -34,8 +35,9 @@ schema:
     base_topic: str
   dali:
     device: str
-    driver: list(tridonic|auto|dali_server|hasseb)
-    log_level: list(trace|debug|info|warning|error)
+    driver: list(hasseb|tridonic|dali_server|dummy)
+    log_level: list(critical|error|warning|info|debug)
+  ha_discovery_prefix: str
 privileged:
   - SYS_RAWIO
 map:
