@@ -16,12 +16,16 @@ DALI_DEVICE=$(jq -r '.dali.device' /data/options.json)
 DALI_DRIVER=$(jq -r '.dali.driver' /data/options.json)
 LOG_LEVEL=$(jq -r '.dali.log_level' /data/options.json)
 
-# Für Preflight als ENV exportieren
+# >>> NEU: HA Discovery Prefix lesen
+HA_DISCOVERY_PREFIX=$(jq -r '.ha_discovery_prefix' /data/options.json)
+
+# Für Preflight/Launcher als ENV exportieren
 export MQTT_HOST MQTT_PORT MQTT_USER MQTT_PASS BASE_TOPIC
-export DALI_DEVICE DALI_DRIVER LOG_LEVEL
+export DALI_DEVICE DALI_DRIVER LOG_LEVEL HA_DISCOVERY_PREFIX
 
 echo "[dali2mqtt] Start: device=${DALI_DEVICE}, driver=${DALI_DRIVER}, topic=${BASE_TOPIC}"
 echo "[dali2mqtt] MQTT target: host=${MQTT_HOST} port=${MQTT_PORT} user=${MQTT_USER}"
+echo "[dali2mqtt] HA discovery prefix: ${HA_DISCOVERY_PREFIX}"
 
 # Auf HID-Device warten (max. 15s)
 for i in $(seq 1 30); do
@@ -82,13 +86,14 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Modul starten – korrekte Flags laut dgomes/dali2mqtt:
+# Modul starten – MIT Discovery
 exec python -m dali2mqtt.dali2mqtt \
   --mqtt-server "${MQTT_HOST}" \
   --mqtt-port "${MQTT_PORT}" \
   ${MQTT_USER:+--mqtt-username "${MQTT_USER}"} \
   ${MQTT_PASS:+--mqtt-password "${MQTT_PASS}"} \
   --mqtt-base-topic "${BASE_TOPIC}" \
+  --ha-discovery-prefix "${HA_DISCOVERY_PREFIX}" \
   --dali-driver "${DALI_DRIVER}" \
   --device "${DALI_DEVICE}" \
   --log-level "${LOG_LEVEL}"
