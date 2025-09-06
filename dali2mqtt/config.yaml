@@ -12,6 +12,7 @@ boot: auto
 ingress: false
 uart: false
 udev: true
+apparmor: false
 
 devices:
   - /dev/hidraw0
