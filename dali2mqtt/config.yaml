@@ -43,7 +43,6 @@ schema:
     log_level: list(critical|error|warning|info|debug)
   ha_discovery_prefix: str
 
-# volle Rechte (zum Testen/Entstören; danach gern wieder strenger machen)
 apparmor: false
 privileged: true
 
