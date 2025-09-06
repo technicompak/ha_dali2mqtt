@@ -1,5 +1,5 @@
 name: dali2mqtt (Tridonic/Lunatone HID)
-version: "0.1.9"
+version: "0.2.0"
 slug: dali2mqtt
 description: Bridge DALI (Tridonic/Lunatone HID) to MQTT for Home Assistant (wrapper around dgomes/dali2mqtt)
 arch:
@@ -12,11 +12,13 @@ boot: auto
 ingress: false
 uart: false
 udev: true
+# 1) beide Devices in den Container durchreichen
 devices:
   - /dev/hidraw0:/dev/hidraw0
+  - /dev/bus/usb:/dev/bus/usb   # <— NEU: für libusb
 options:
   mqtt:
-    host: core-mosquitto        # << Standard-Host für das Mosquitto-Add-on
+    host: core-mosquitto
     port: 1883
     username: ""
     password: ""
@@ -25,7 +27,7 @@ options:
     device: "/dev/hidraw0"
     driver: "tridonic"
     log_level: "debug"
-  ha_discovery_prefix: "homeassistant"   # << NEU
+  ha_discovery_prefix: "homeassistant"
 schema:
   mqtt:
     host: str
@@ -38,8 +40,12 @@ schema:
     driver: list(hasseb|tridonic|dali_server|dummy)
     log_level: list(critical|error|warning|info|debug)
   ha_discovery_prefix: str
-privileged:
-  - SYS_RAWIO
+# 2) vorübergehend erhöhte Privilegien erlauben (für Kernel-Detach)
+privileged: true
+# (Wenn es damit läuft, können wir später wieder reduzieren auf:)
+# privileged:
+#   - SYS_ADMIN
+#   - SYS_RAWIO
 map:
   - config:rw
   - share:rw
