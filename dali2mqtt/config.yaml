@@ -1,5 +1,5 @@
 name: dali2mqtt (Tridonic/Lunatone HID)
-version: "0.2.4"
+version: "0.2.1"
 slug: dali2mqtt
 description: Bridge DALI (Tridonic/Lunatone HID) to MQTT for Home Assistant (wrapper around dgomes/dali2mqtt)
 arch:
@@ -14,8 +14,8 @@ uart: false
 udev: true
 
 devices:
-  - /dev/hidraw0:/dev/hidraw0
-  - /dev/bus/usb:/dev/bus/usb
+  - /dev/hidraw0
+  - /dev/bus/usb
 
 options:
   mqtt:
@@ -43,8 +43,9 @@ schema:
     log_level: list(critical|error|warning|info|debug)
   ha_discovery_prefix: str
 
-apparmor: false
-privileged: true
+privileged:
+  - SYS_ADMIN
+  - SYS_RAWIO
 
 map:
   - config:rw
