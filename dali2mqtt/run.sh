@@ -40,6 +40,27 @@ if [ ! -e "${DALI_DEVICE}" ]; then
   exit 1
 fi
 
+# --- usbhid vom DALI-USB trennen (VID:PID 17b5:0020), falls gebunden ---
+unbind_usbhid() {
+  local UNBIND=/sys/bus/usb/drivers/usbhid/unbind
+  [ -w "$UNBIND" ] || return 0
+  for dev in /sys/bus/usb/devices/*; do
+    [ -f "$dev/idVendor" ]  && [ -f "$dev/idProduct" ] || continue
+    vid=$(cat "$dev/idVendor" 2>/dev/null || echo "")
+    pid=$(cat "$dev/idProduct" 2>/dev/null || echo "")
+    if [ "$vid" = "17b5" ] && [ "$pid" = "0020" ]; then
+      for intf in "$dev":1.*; do
+        base=$(basename "$intf")
+        if [ -d "$intf" ]; then
+          echo "[dali2mqtt] unbind usbhid for interface $base"
+          echo "$base" > "$UNBIND" 2>/dev/null || true
+        fi
+      done
+    fi
+  done
+}
+unbind_usbhid
+
 # Ins geklonte Repo wechseln
 cd /opt/dali2mqtt
 
