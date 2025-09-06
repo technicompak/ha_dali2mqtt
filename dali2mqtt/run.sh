@@ -4,6 +4,8 @@ set -euo pipefail
 # Virtuelle Umgebung in PATH + unbuffered Logs
 export PATH="/opt/venv/bin:$PATH"
 export PYTHONUNBUFFERED=1
+# Libusb-Debug (optional; bei Bedarf auf 0 setzen)
+export LIBUSB_DEBUG=3
 
 # Optionen aus /data/options.json laden
 MQTT_HOST=$(jq -r '.mqtt.host' /data/options.json)
@@ -15,8 +17,6 @@ BASE_TOPIC=$(jq -r '.mqtt.base_topic' /data/options.json)
 DALI_DEVICE=$(jq -r '.dali.device' /data/options.json)
 DALI_DRIVER=$(jq -r '.dali.driver' /data/options.json)
 LOG_LEVEL=$(jq -r '.dali.log_level' /data/options.json)
-
-# >>> NEU: HA Discovery Prefix lesen
 HA_DISCOVERY_PREFIX=$(jq -r '.ha_discovery_prefix' /data/options.json)
 
 # Für Preflight/Launcher als ENV exportieren
@@ -43,7 +43,7 @@ fi
 # --- usbhid vom DALI-USB trennen (VID:PID 17b5:0020), falls gebunden ---
 unbind_usbhid() {
   local UNBIND=/sys/bus/usb/drivers/usbhid/unbind
-  [ -w "$UNBIND" ] || return 0
+  [ -w "$UNBIND" ] || { echo "[dali2mqtt] usbhid unbind not writable (likely AppArmor/caps)"; return 0; }
   for dev in /sys/bus/usb/devices/*; do
     [ -f "$dev/idVendor" ]  && [ -f "$dev/idProduct" ] || continue
     vid=$(cat "$dev/idVendor" 2>/dev/null || echo "")
